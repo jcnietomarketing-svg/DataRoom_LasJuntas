@@ -510,58 +510,7 @@ function renderKanban(){
     const cards=f.filter(c=>c.stage===k);
     return `<div class="k-col ks-${k}">
       <div class="k-head"><div class="k-hl"><div class="k-dot"></div><div><div class="k-title">${k}·${v.label}</div><div class="k-sub">${v.sub}</div></div></div><span class="k-cnt">${cards.length}</span></div>
-      <div class="k-body">${cards.length===0?'<div class="k-empty">Sin clientes</div>':cards.map(c=>`<div class="k-card" onclick="openCrmEdit(${c.id})"><div class="k-name">${c.name}</div><div class="k-type">${c.type}</div><div class="k-tags"><span class="k-tag k-mod">${c.modality}</span>${c.nda==='Sí'?'<span class="k-tag k-nda">NDA✓</span>':''}${prioTag(c.priority)}</div></div>`).join('')}</div>
-    </div>`;
-  }).join('');
-}
-function renderTable(){
-  const f=getFiltered();
-  document.getElementById('crmTableBody').innerHTML=f.map((c,i)=>`<tr>
-    <td style="color:var(--gray);font-size:11px;">${i+1}</td><td><strong>${c.name}</strong></td>
-    <td style="font-size:11px;color:var(--gray);">${c.type}</td>
-    <td><select style="padding:2px 6px;border-radius:5px;border:1.5px solid var(--gray-border);font-size:10px;" onchange="chgStage(${c.id},this.value)">${Object.entries(STAGES).map(([k,v])=>`<option value="${k}" ${k===c.stage?'selected':''}>${k}—${v.label}</option>`).join('')}</select></td>
-    <td style="font-size:11px;">${c.modality}</td><td>${prioTag(c.priority)}</td>
-    <td>${c.nda==='Sí'?'<span style="color:var(--green);font-weight:700;">✓</span>':c.nda}</td>
-    <td style="font-size:10px;color:var(--gray);max-width:150px;">${c.next||'—'}</td>
-    <td><button onclick="openCrmEdit(${c.id})" style="background:var(--navy);color:#fff;border:none;padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;margin-right:2px;">✎</button><button onclick="delClient(${c.id})" style="background:#FEF2F2;color:var(--red);border:1px solid var(--red);padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;">✕</button></td>
-  </tr>`).join('');
-}
-function setCrmView(v){
-  crmView=v;
-  document.getElementById('crmKanban').style.display=v==='kanban'?'flex':'none';
-  document.getElementById('crmTable').style.display=v==='table'?'block':'none';
-  document.getElementById('vKanban').className='vbtn'+(v==='kanban'?' active':'');
-  document.getElementById('vTable').className='vbtn'+(v==='table'?' active':'');
-  renderCRM();
-}
-function chgStage(id,s){const c=clients.find(c=>c.id===id);if(c){c.stage=s;renderCRM();}}
-function delClient(id){if(!confirm('¿Eliminar?'))return;clients=clients.filter(c=>c.id!==id);renderCRM();}
-function openCrmModal(){
-  crmEditId=null;document.getElementById('crmMT').textContent='Nuevo Cliente';
-  ['cf_name','cf_next','cf_notes'].forEach(f=>document.getElementById(f).value='');
-  document.getElementById('cf_stage').value='S';document.getElementById('cf_priority').value='Media';document.getElementById('cf_nda').value='No';
-  document.getElementById('crmModal').classList.add('open');
-}
-function openCrmEdit(id){
-  const c=clients.find(c=>c.id===id);if(!c)return;
-  crmEditId=id;document.getElementById('crmMT').textContent='Editar — '+c.name;
-  document.getElementById('cf_name').value=c.name;document.getElementById('cf_type').value=c.type;
-  document.getElementById('cf_stage').value=c.stage;document.getElementById('cf_modality').value=c.modality;
-  document.getElementById('cf_priority').value=c.priority;document.getElementById('cf_nda').value=c.nda;
-  document.getElementById('cf_next').value=c.next;document.getElementById('cf_notes').value=c.notes;
-  document.getElementById('crmModal').classList.add('open');
-}
-function closeCrmModal(){document.getElementById('crmModal').classList.remove('open');}
-function saveCrmClient(){
-  const name=document.getElementById('cf_name').value.trim();if(!name){alert('Nombre obligatorio');return;}
-  const d={name,type:document.getElementById('cf_type').value,stage:document.getElementById('cf_stage').value,modality:document.getElementById('cf_modality').value,priority:document.getElementById('cf_priority').value,nda:document.getElementById('cf_nda').value,next:document.getElementById('cf_next').value,notes:document.getElementById('cf_notes').value};
-  if(crmEditId){const i=clients.findIndex(c=>c.id===crmEditId);clients[i]={...clients[i],...d};}
-  else{d.id=Date.now();clients.push(d);}
-  closeCrmModal();renderCRM();
-}
-function exportCRM(){
-  const h=['Nombre','Tipo','Etapa','Modalidad','Prioridad','NDA','Próximo Paso','Notas'];
-  const rows=clients.map(c=>[c.name,c.type,c.stage+'—'+STAGES[c.stage].label,c.modality,c.priority,c.nda,c.next,c.notes].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+      <div class="k-body">${cards.length===0?'<div class="k-empty">Sin clientes</div>':cards.map(c=>`<div class="k-card" onclick="openCrmEdit(${c.id})"><div class="k-name">${c.name}</div><div class="k-type">${c.type}</div><div class="k-tags"><span class="k-tag k-mod">${c.modality}</span>${c.nda==='Sí'?'<span class="k-tag k-nda">NDA✓</span>':''}${prioTag(c.priority)}</div></div>`)n(','));
   const csv=[h.join(','),...rows].join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
