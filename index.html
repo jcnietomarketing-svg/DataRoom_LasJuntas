@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Room — Finca Las Juntas | Terramatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1B3A6B;--navy-dark:#112444;--navy-mid:#243f6e;--gold:#C9A84C;--gold-light:#E8C97A;--gold-pale:#FDF8EC;--teal:#0F6B6B;--teal-light:#E0F0F0;--cream:#F8F5EF;--white:#FFFFFF;--gray:#6B7280;--gray-light:#F1F0ED;--gray-border:#E5E2DB;--red:#EF4444;--green:#10B981;--amber:#F59E0B;--purple:#8B5CF6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:#1a1a1a;min-height:100vh;}
+#accessScreen{position:fixed;inset:0;z-index:9999;background:var(--navy-dark);display:flex;align-items:center;justify-content:center;}
+.access-box{background:var(--white);border-radius:20px;padding:48px 40px;max-width:420px;width:90%;text-align:center;box-shadow:0 40px 80px rgba(0,0,0,.4);}
+.access-logo{width:64px;height:64px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.access-logo span{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold);}
+.access-box h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--navy);margin-bottom:4px;}
+.access-box p{font-size:13px;color:var(--gray);margin-bottom:28px;}
+.access-tag{display:inline-block;background:var(--gold-pale);color:var(--gold);border:1px solid var(--gold);font-size:11px;font-weight:600;letter-spacing:1px;padding:4px 12px;border-radius:20px;text-transform:uppercase;margin-bottom:20px;}
+.access-input{width:100%;padding:12px 16px;border:2px solid var(--gray-border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;transition:border-color .2s;margin-bottom:8px;}
+.access-input:focus{border-color:var(--navy);}
+.access-hint{font-size:11px;color:var(--gray);margin-bottom:20px;}
+.access-btn{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
+.access-btn:hover{background:var(--navy-mid);}
+.access-error{color:var(--red);font-size:12px;margin-top:8px;display:none;}
+.access-footer{margin-top:24px;font-size:11px;color:#bbb;}
+#appShell{display:none;flex-direction:column;min-height:100vh;}
+.topnav{background:var(--navy);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--gold);}
+.topnav-left{display:flex;align-items:center;gap:14px;}
+.nav-logo{width:36px;height:36px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;color:var(--navy);font-size:16px;flex-shrink:0;}
+.nav-title h1{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#fff;}
+.nav-title p{font-size:10px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;}
+.topnav-right{display:flex;align-items:center;gap:10px;}
+.nav-badge{background:rgba(201,168,76,.15);border:1px solid var(--gold);color:var(--gold);font-size:10px;font-weight:600;letter-spacing:.5px;padding:3px 10px;border-radius:20px;text-transform:uppercase;}
+.nav-lock{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.main-layout{display:flex;flex:1;}
+.sidebar{width:220px;flex-shrink:0;background:var(--white);border-right:1px solid var(--gray-border);padding:16px 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+.sidebar-section{padding:8px 16px 4px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;color:#374151;border-left:3px solid transparent;}
+.nav-item:hover{background:var(--gray-light);color:var(--navy);}
+.nav-item.active{background:var(--gold-pale);color:var(--navy);font-weight:600;border-left-color:var(--gold);}
+.nav-icon{font-size:15px;width:20px;text-align:center;}
+.content{flex:1;overflow-y:auto;padding:28px 32px;}
+.page{display:none;}
+.page.active{display:block;}
+.page-header{margin-bottom:24px;}
+.page-header h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--navy);}
+.page-header p{font-size:13px;color:var(--gray);margin-top:4px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi-card{background:var(--white);border-radius:12px;padding:18px 20px;border:1px solid var(--gray-border);position:relative;overflow:hidden;}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-gold::after{background:var(--gold);}
+.kpi-navy::after{background:var(--navy);}
+.kpi-teal::after{background:var(--teal);}
+.kpi-green::after{background:var(--green);}
+.kpi-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);}
+.kpi-label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.kpi-sub{font-size:12px;color:var(--gray);margin-top:6px;}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.info-card{background:var(--white);border-radius:12px;padding:20px;border:1px solid var(--gray-border);margin-bottom:0;}
+.info-card h3{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--gray-border);}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f5f3ef;font-size:13px;}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--gray);font-size:12px;}
+.info-val{font-weight:600;color:#1a1a1a;}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.tag-gold{background:var(--gold-pale);color:#92400e;}
+.tag-teal{background:var(--teal-light);color:var(--teal);}
+.tag-navy{background:#EEF2FF;color:var(--navy);}
+.tag-green{background:#ECFDF5;color:#065f46;}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px;}
+.doc-card{background:var(--white);border-radius:12px;padding:18px;border:1px solid var(--gray-border);cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:10px;}
+.doc-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px);border-color:var(--gold);}
+.doc-icon{font-size:28px;}
+.doc-name{font-size:13px;font-weight:700;color:var(--navy);}
+.doc-desc{font-size:11px;color:var(--gray);line-height:1.5;}
+.doc-footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.doc-ready{background:#ECFDF5;color:#065f46;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
+.doc-pending{background:#FFFBEB;color:#92400e;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
+.fin-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:20px;}
+.fin-table th{background:var(--navy);color:#fff;padding:12px 16px;text-align:left;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.fin-table td{padding:12px 16px;border-bottom:1px solid #f0ede8;font-size:13px;vertical-align:middle;}
+.fin-table tr:last-child td{border-bottom:none;}
+.fin-table tr.hl td{background:var(--gold-pale);font-weight:700;}
+.fin-table tr:hover td{background:var(--gray-light);}
+.crm-wrap{background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--gray-border);}
+.crm-header{background:var(--navy);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.crm-header h3{font-family:'Playfair Display',serif;font-size:18px;color:#fff;}
+.crm-header p{font-size:11px;color:var(--gold);margin-top:2px;}
+.crm-stats{display:flex;gap:14px;padding:14px 20px;flex-wrap:wrap;}
+.cs{background:var(--gray-light);border-radius:8px;padding:8px 14px;text-align:center;}
+.cs-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--navy);}
+.cs-lbl{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.crm-toolbar{padding:12px 20px;display:flex;gap:10px;border-bottom:1px solid var(--gray-border);align-items:center;}
+.crm-search{flex:1;max-width:260px;display:flex;align-items:center;gap:8px;background:var(--gray-light);border-radius:8px;padding:7px 12px;}
+.crm-search input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;width:100%;}
+.btns{padding:6px 12px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-nv{background:var(--navy);color:#fff;}
+.btn-gd{background:var(--gold);color:var(--navy);}
+.vtoggle{display:flex;gap:3px;background:var(--gray-light);border-radius:8px;padding:3px;}
+.vbtn{padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:transparent;color:var(--gray);}
+.vbtn.active{background:var(--white);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.kanban-wrap{display:flex;gap:10px;padding:14px 16px;overflow-x:auto;}
+.k-col{min-width:185px;flex:1;background:var(--gray-light);border-radius:10px;overflow:hidden;}
+.k-head{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;}
+.k-hl{display:flex;align-items:center;gap:6px;}
+.k-dot{width:9px;height:9px;border-radius:50%;}
+.k-title{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.k-sub{font-size:9px;color:var(--gray);}
+.k-cnt{font-size:10px;font-weight:700;color:#fff;padding:2px 6px;border-radius:8px;}
+.k-body{padding:6px;min-height:50px;}
+.k-card{background:#fff;border:1px solid var(--gray-border);border-radius:8px;padding:9px;margin-bottom:5px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.k-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.k-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.1);}
+.k-name{font-size:12px;font-weight:600;color:#1a1a1a;}
+.k-type{font-size:10px;color:var(--gray);margin-top:1px;}
+.k-tags{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;}
+.k-tag{font-size:9px;padding:2px 5px;border-radius:6px;font-weight:600;}
+.k-mod{background:#EEF2FF;color:var(--navy);}
+.k-nda{background:#FFFBEB;color:#92400e;}
+.k-hi{background:#FEF2F2;color:#991b1b;}
+.k-me{background:#FFFBEB;color:#92400e;}
+.k-lo{background:#ECFDF5;color:#065f46;}
+.k-empty{text-align:center;color:#ccc;font-size:11px;padding:14px 6px;}
+.ks-S .k-head{background:#EEF2FF;}.ks-S .k-title{color:#6366F1;}.ks-S .k-cnt{background:#6366F1;}.ks-S .k-dot{background:#6366F1;}.ks-S .k-card::before{background:#6366F1;}
+.ks-P .k-head{background:#EFF6FF;}.ks-P .k-title{color:#3B82F6;}.ks-P .k-cnt{background:#3B82F6;}.ks-P .k-dot{background:#3B82F6;}.ks-P .k-card::before{background:#3B82F6;}
+.ks-A .k-head{background:#FFFBEB;}.ks-A .k-title{color:#F59E0B;}.ks-A .k-cnt{background:#F59E0B;}.ks-A .k-dot{background:#F59E0B;}.ks-A .k-card::before{background:#F59E0B;}
+.ks-N .k-head{background:#FEF2F2;}.ks-N .k-title{color:#EF4444;}.ks-N .k-cnt{background:#EF4444;}.ks-N .k-dot{background:#EF4444;}.ks-N .k-card::before{background:#EF4444;}
+.ks-C .k-head{background:#ECFDF5;}.ks-C .k-title{color:#10B981;}.ks-C .k-cnt{background:#10B981;}.ks-C .k-dot{background:#10B981;}.ks-C .k-card::before{background:#10B981;}
+.ks-O .k-head{background:#F5F3FF;}.ks-O .k-title{color:#8B5CF6;}.ks-O .k-cnt{background:#8B5CF6;}.ks-O .k-dot{background:#8B5CF6;}.ks-O .k-card::before{background:#8B5CF6;}
+.mo{display:none;position:fixed;inset:0;background:rgba(27,58,107,.5);z-index:9000;align-items:center;justify-content:center;}
+.mo.open{display:flex;}
+.modal{background:#fff;border-radius:16px;width:90%;max-width:500px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:su .25s ease;}
+@keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.m-hd{padding:16px 20px;border-bottom:1px solid var(--gray-border);display:flex;justify-content:space-between;align-items:center;}
+.m-ti{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--navy);}
+.m-cl{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray);}
+.m-bd{padding:16px 20px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fgi{display:flex;flex-direction:column;gap:3px;}
+.fgi.full{grid-column:1/-1;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray);}
+.fi,.fs,.ft{padding:8px 10px;border:1.5px solid var(--gray-border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;transition:border-color .2s;}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--navy);}
+.ft{resize:vertical;min-height:65px;}
+.m-ft{padding:12px 20px;border-top:1px solid var(--gray-border);display:flex;justify-content:flex-end;gap:8px;}
+.steps-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.step-item{background:var(--white);border-radius:10px;padding:14px 16px;border:1px solid var(--gray-border);display:flex;gap:12px;align-items:flex-start;}
+.step-num{width:28px;height:28px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.step-body h4{font-size:13px;font-weight:700;color:var(--navy);}
+.step-body p{font-size:12px;color:var(--gray);margin-top:3px;}
+.c-card{background:var(--white);border-radius:12px;padding:20px;border:1px solid var(--gray-border);display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+.c-av{width:52px;height:52px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.c-info h3{font-size:15px;font-weight:700;color:var(--navy);}
+.c-info p{font-size:12px;color:var(--gray);margin-top:2px;}
+.c-links{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;}
+.c-link{font-size:12px;color:var(--navy);font-weight:600;}
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr;}.section-grid{grid-template-columns:1fr;}.sidebar{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="accessScreen">
+  <div class="access-box">
+    <div class="access-logo"><span>T</span></div>
+    <div class="access-tag">Información Confidencial</div>
+    <h2>Data Room — Finca Las Juntas</h2>
+    <p>Acceso exclusivo para destinatarios autorizados por Terramatch</p>
+    <input type="password" class="access-input" id="pwdInput" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')checkAccess()">
+    <div class="access-hint">Contraseña provista por Juan Carlos Nieto R. · Terramatch</div>
+    <button class="access-btn" onclick="checkAccess()">Ingresar al Data Room</button>
+    <div class="access-error" id="accessError">Contraseña incorrecta. Contacte a Terramatch.</div>
+    <div class="access-footer">Terramatch SAS · NIT 901.612.770-8 · 2026</div>
+  </div>
+</div>
+
+<div id="appShell">
+  <nav class="topnav">
+    <div class="topnav-left">
+      <div class="nav-logo">T</div>
+      <div class="nav-title"><h1>Data Room — Finca Las Juntas</h1><p>Terramatch · Propuesta Confidencial 2026</p></div>
+    </div>
+    <div class="topnav-right">
+      <span class="nav-badge">970.915 m²</span>
+      <span class="nav-badge">COP $550K/m²</span>
+      <button class="nav-lock" onclick="logout()">🔒 Salir</button>
+    </div>
+  </nav>
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">General</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">🏠</span>Dashboard</div>
+      <div class="nav-item" onclick="showPage('asset',this)"><span class="nav-icon">🏗️</span>El Activo</div>
+      <div class="nav-item" onclick="showPage('financial',this)"><span class="nav-icon">📊</span>Indicadores Financieros</div>
+      <div class="sidebar-section" style="margin-top:8px;">Documentos</div>
+      <div class="nav-item" onclick="showPage('documents',this)"><span class="nav-icon">📁</span>Repositorio</div>
+      <div class="nav-item" onclick="showPage('legal',this)"><span class="nav-icon">⚖️</span>Legal & Normativa</div>
+      <div class="sidebar-section" style="margin-top:8px;">Pipeline</div>
+      <div class="nav-item" onclick="showPage('crm',this)"><span class="nav-icon">🎯</span>CRM — SPANCO</div>
+      <div class="nav-item" onclick="showPage('nextsteps',this)"><span class="nav-icon">🚀</span>Próximos Pasos</div>
+      <div class="sidebar-section" style="margin-top:8px;">Contacto</div>
+      <div class="nav-item" onclick="showPage('contact',this)"><span class="nav-icon">👤</span>Terramatch</div>
+    </aside>
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header"><h2>Finca Las Juntas — Resumen Ejecutivo</h2><p>La mayor oportunidad de desarrollo industrial-comercial en el corredor occidente de Bogotá</p></div>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-gold"><div class="kpi-num">970.915</div><div class="kpi-label">m² Área Total</div><div class="kpi-sub">Mosquera, Cundinamarca</div></div>
+          <div class="kpi-card kpi-navy"><div class="kpi-num">$550K</div><div class="kpi-label">COP/m² · Precio de oferta</div><div class="kpi-sub">≈ $534.000M COP total</div></div>
+          <div class="kpi-card kpi-teal"><div class="kpi-num">3</div><div class="kpi-label">Accesos exclusivos INVIAS</div><div class="kpi-sub">Escritura pública · ALO Sur</div></div>
+          <div class="kpi-card kpi-green"><div class="kpi-num">Q2·26</div><div class="kpi-label">Apertura ALO Sur</div><div class="kpi-sub">40–80% valorización proyectada</div></div>
+        </div>
+        <div class="section-grid">
+          <div class="info-card"><h3>📍 Ficha del Activo</h3>
+            <div class="info-row"><span class="info-key">Nombre</span><span class="info-val">Finca Las Juntas</span></div>
+            <div class="info-row"><span class="info-key">Municipio</span><span class="info-val">Mosquera, Cundinamarca</span></div>
+            <div class="info-row"><span class="info-key">Área total</span><span class="info-val">970.915 m²</span></div>
+            <div class="info-row"><span class="info-key">Área Comercial</span><span class="info-val">185.000 m²</span></div>
+            <div class="info-row"><span class="info-key">Área Agro-Industrial</span><span class="info-val">785.915 m²</span></div>
+            <div class="info-row"><span class="info-key">Normativa</span><span class="info-val"><span class="tag tag-teal">Acuerdo 028 PBOT</span></span></div>
+          </div>
+          <div class="info-card"><h3>📏 Distancias Clave</h3>
+            <div class="info-row"><span class="info-key">Av. Bosa</span><span class="info-val"><span class="tag tag-gold">3 km</span></span></div>
+            <div class="info-row"><span class="info-key">Calle 13</span><span class="info-val"><span class="tag tag-gold">8 km</span></span></div>
+            <div class="info-row"><span class="info-key">Metro Bogotá (taller)</span><span class="info-val"><span class="tag tag-gold">2 km</span></span></div>
+            <div class="info-row"><span class="info-key">Aeropuerto El Dorado</span><span class="info-val"><span class="tag tag-navy">13 km</span></span></div>
+            <div class="info-row"><span class="info-key">Funza / Madrid</span><span class="info-val"><span class="tag tag-navy">5 km</span></span></div>
+            <div class="info-row"><span class="info-key">Centro de Bogotá</span><span class="info-val"><span class="tag tag-navy">28 km</span></span></div>
+          </div>
+        </div>
+        <div class="info-card" style="margin-bottom:0;">
+          <h3>⚡ Ventajas Competitivas</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px;">
+            <div style="background:var(--gold-pale);border-radius:8px;padding:12px;"><div style="font-weight:700;font-size:13px;color:var(--navy);">Acceso INVIAS irrepetible</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Único predio con escritura pública por ambos costados de la ALO Sur.</div></div>
+            <div style="background:#EEF2FF;border-radius:8px;padding:12px;"><div style="font-weight:700;font-size:13px;color:var(--navy);">0% vacancia bodegas A</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Corredor Mosquera-Soacha. Demanda reprimida activada por ALO Sur.</div></div>
+            <div style="background:var(--teal-light);border-radius:8px;padding:12px;"><div style="font-weight:700;font-size:13px;color:var(--navy);">Precio 20–69% vs. mercado</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Por debajo de Funza-Siberia, Madrid y corredor Calle 80 (Cota).</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EL ACTIVO -->
+      <div class="page" id="page-asset">
+        <div class="page-header"><h2>El Activo — 970.915 m²</h2><p>Distribución de usos: Zona Comercial (frente ALO) + Área Agro-Industrial</p></div>
+        <div class="section-grid" style="margin-bottom:16px;">
+          <div class="info-card"><h3>📐 Distribución</h3>
+            <div style="background:linear-gradient(135deg,#C9A84C22,#C9A84C11);border:1px solid var(--gold);border-radius:10px;padding:14px;margin-bottom:10px;"><div style="font-size:22px;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif;">185.000 m²</div><div style="font-size:13px;font-weight:700;color:var(--navy);">Área Comercial</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Costados oriental y occidental ALO Sur — Acuerdo 028 PBOT Mosquera.</div></div>
+            <div style="background:linear-gradient(135deg,#0F6B6B22,#0F6B6B11);border:1px solid var(--teal);border-radius:10px;padding:14px;"><div style="font-size:22px;font-weight:700;color:var(--teal);font-family:'Playfair Display',serif;">785.915 m²</div><div style="font-size:13px;font-weight:700;color:var(--navy);">Área Agro-Industrial</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Uso industrial, logístico, agropecuario y de servicios.</div></div>
+          </div>
+          <div class="info-card"><h3>🏗️ Infraestructura Disponible</h3>
+            <div class="info-row"><span class="info-key">⚡ Energía eléctrica</span><span class="info-val"><span class="tag tag-green">Disponible</span></span></div>
+            <div class="info-row"><span class="info-key">💧 Agua potable</span><span class="info-val"><span class="tag tag-green">Disponible</span></span></div>
+            <div class="info-row"><span class="info-key">🔥 Gas natural</span><span class="info-val"><span class="tag tag-green">Disponible</span></span></div>
+            <div class="info-row"><span class="info-key">🌐 Fibra óptica</span><span class="info-val"><span class="tag tag-green">Disponible</span></span></div>
+            <div class="info-row"><span class="info-key">🛣️ Vías pavimentadas</span><span class="info-val"><span class="tag tag-green">Disponible</span></span></div>
+            <div style="background:var(--gold-pale);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--gray);">✅ <strong>Sin inversión adicional en infraestructura base.</strong></div>
+          </div>
+        </div>
+        <div class="info-card"><h3>📋 Usos Permitidos — Acuerdo 028 PBOT Mosquera</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;">
+            <div style="background:var(--gold-pale);border-radius:10px;padding:14px;"><div style="font-weight:700;color:var(--navy);margin-bottom:8px;">🏭 INDUSTRIAL</div><div style="font-size:12px;color:var(--gray);line-height:1.9;">• Bodegas y almacenes<br>• Plantas de producción<br>• Logística y distribución<br>• Talleres y mantenimiento<br>• Servicios de transporte</div></div>
+            <div style="background:#EEF2FF;border-radius:10px;padding:14px;"><div style="font-weight:700;color:var(--navy);margin-bottom:8px;">🛍️ COMERCIAL</div><div style="font-size:12px;color:var(--gray);line-height:1.9;">• Retail y grandes superficies<br>• Hoteles y hospedaje<br>• Restaurantes y servicios<br>• Estaciones de servicio<br>• Centros comerciales</div></div>
+            <div style="background:var(--teal-light);border-radius:10px;padding:14px;"><div style="font-weight:700;color:var(--navy);margin-bottom:8px;">🏛️ INSTITUCIONAL</div><div style="font-size:12px;color:var(--gray);line-height:1.9;">• Centros educativos<br>• Servicios de salud<br>• Oficinas corporativas<br>• Servicios públicos<br>• Usos mixtos</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCIERO -->
+      <div class="page" id="page-financial">
+        <div class="page-header"><h2>Indicadores Financieros</h2><p>Precio competitivo con prima de escasez — valorización acelerada post-ALO Sur</p></div>
+        <div class="kpi-grid" style="margin-bottom:20px;">
+          <div class="kpi-card kpi-gold"><div class="kpi-num">$550K</div><div class="kpi-label">COP/m² · Precio oferta</div></div>
+          <div class="kpi-card kpi-navy"><div class="kpi-num">~$534B</div><div class="kpi-label">COP · Valor total</div></div>
+          <div class="kpi-card kpi-teal"><div class="kpi-num">40–80%</div><div class="kpi-label">Valorización 3 años</div></div>
+          <div class="kpi-card kpi-green"><div class="kpi-num">2.5x</div><div class="kpi-label">Retorno conservador 5 años</div></div>
+        </div>
+        <table class="fin-table">
+          <thead><tr><th>Referencia de Mercado</th><th>Área</th><th>Precio / m²</th><th>Ventaja vs. Las Juntas</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td>🎯 <strong>Las Juntas (OFERTA)</strong></td><td>970.915 m²</td><td><strong>COP $550.000</strong></td><td><span class="tag tag-gold">PRECIO BASE</span></td></tr>
+            <tr><td>Zona Funza – Siberia</td><td>50.000–150.000 m²</td><td>$650.000–$900.000</td><td style="color:var(--green);font-weight:600;">-18% a -38%</td></tr>
+            <tr><td>Parques ind. Madrid</td><td>10.000–50.000 m²</td><td>$700.000–$850.000</td><td style="color:var(--green);font-weight:600;">-21% a -35%</td></tr>
+            <tr><td>Corredor Calle 80 (Cota)</td><td>10.000–30.000 m²</td><td>$1.2M–$1.8M</td><td style="color:var(--green);font-weight:600;">-54% a -69%</td></tr>
+          </tbody>
+        </table>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div style="border:1.5px solid var(--gold);border-radius:10px;padding:14px;"><div style="font-weight:700;font-size:13px;color:var(--navy);">Adquisición Total</div><div style="font-size:11px;color:var(--gray);margin-top:6px;line-height:1.7;">100% del activo<br>$550K/m² · ~$534.000M COP<br>Escritura inmediata<br>Financiación bancaria viable</div></div>
+          <div style="border:1.5px solid var(--navy);border-radius:10px;padding:14px;"><div style="font-weight:700;font-size:13px;color:var(--navy);">Joint Venture</div><div style="font-size:11px;color:var(--gray);margin-top:6px;line-height:1.7;">Tierra + capital<br>Mínimo 25% del área<br>SPV o fiducia posibles<br>Participación en utilidades</div></div>
+          <div style="border:1.5px solid var(--teal);border-radius:10px;padding:14px;"><div style="font-weight:700;font-size:13px;color:var(--navy);">Desarrollo por Fases</div><div style="font-size:11px;color:var(--gray);margin-top:6px;line-height:1.7;">Inicio desde 100.000 m²<br>Zona comercial ALO Sur<br>Opción de compra total<br>Alta liquidez operativa</div></div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTOS -->
+      <div class="page" id="page-documents">
+        <div class="page-header"><h2>Repositorio de Documentos</h2><p>Documentación oficial del proceso de inversión — 2026</p></div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:10px;">Documentos de Proceso</div>
+        <div class="doc-grid">
+          <div class="doc-card" onclick="downloadB64('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,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','LOI_LasJuntas_Terramatch.docx')"><div class="doc-icon">📄</div><div class="doc-name">LOI — Carta de Intención</div><div class="doc-desc">Intención de inversión sobre Finca Las Juntas. Campos abiertos para diligenciar.</div><div class="doc-footer"><span class="doc-ready">✓ Disponible</span><span style="font-size:11px;color:var(--navy);font-weight:600;">↓ DOCX</span></div></div>
+          <div class="doc-card" onclick="downloadB64('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,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','MOU_LasJuntas_Terramatch.docx')"><div class="doc-icon">🤝</div><div class="doc-name">MOU — Memorando de Entendimiento</div><div class="doc-desc">Marco de cooperación para estructuración, negociación y cierre de la operación.</div><div class="doc-footer"><span class="doc-ready">✓ Disponible</span><span style="font-size:11px;color:var(--navy);font-weight:600;">↓ DOCX</span></div></div>
+          <div class="doc-card" onclick="window.open('https://legend-option-b8b.notion.site/DataRoom-Finca-Las-Juntas-2c9b2b1227528001bfa5d5c22e6c611e','_blank')"><div class="doc-icon">🔏</div><div class="doc-name">NDA — Acuerdo de Confidencialidad</div><div class="doc-desc">Non-Disclosure Agreement para acceso a información privilegiada del activo.</div><div class="doc-footer"><span class="doc-pending">⏳ Solicitar</span><span style="font-size:11px;color:var(--gold);font-weight:600;">↗ Notion</span></div></div>
+          <div class="doc-card" onclick="window.open('https://legend-option-b8b.notion.site/DataRoom-Finca-Las-Juntas-2c9b2b1227528001bfa5d5c22e6c611e','_blank')"><div class="doc-icon">📑</div><div class="doc-name">Promesa de Compraventa</div><div class="doc-desc">Documento de formalización del cierre. Se emite en fase de negociación final.</div><div class="doc-footer"><span class="doc-pending">⏳ Fase cierre</span><span style="font-size:11px;color:var(--gold);font-weight:600;">↗ Notion</span></div></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:10px;">Documentos Técnicos</div>
+        <div class="doc-grid">
+          <div class="doc-card"><div class="doc-icon">🏢</div><div class="doc-name">Propuesta Comercial 2026</div><div class="doc-desc">Presentación ejecutiva completa: indicadores, masterplan y modalidades de inversión.</div><div class="doc-footer"><span class="doc-ready">✓ Disponible</span><div style="display:flex;gap:8px;"><a href="https://drive.google.com/file/d/13VDmBE-9vcFYcEtoE0IQr9UCD264gn1h/view?usp=sharing" target="_blank" style="font-size:11px;color:var(--navy);font-weight:600;text-decoration:none;">👁 Ver</a><a href="https://drive.google.com/uc?export=download&id=13VDmBE-9vcFYcEtoE0IQr9UCD264gn1h" style="font-size:11px;color:var(--navy);font-weight:600;text-decoration:none;">↓ Descargar</a></div></div></div>
+          <div class="doc-card" onclick="window.open('https://legend-option-b8b.notion.site/DataRoom-Finca-Las-Juntas-2c9b2b1227528001bfa5d5c22e6c611e','_blank')"><div class="doc-icon">🗺️</div><div class="doc-name">Planos Catastrales y Zonificación</div><div class="doc-desc">Planos de loteo, vías de acceso INVIAS y zonificación PBOT Mosquera.</div><div class="doc-footer"><span class="doc-pending">⏳ Visita técnica</span><span style="font-size:11px;color:var(--gold);font-weight:600;">↗ Notion</span></div></div>
+          <div class="doc-card"><div class="doc-icon">🏗️</div><div class="doc-name">Masterplan — Proyección de Desarrollo</div><div class="doc-desc">Esquema arquitectónico para desarrollo mixto industrial-comercial en 2 zonas.</div><div class="doc-footer"><span class="doc-ready">✓ Disponible</span><span style="font-size:11px;color:var(--navy);font-weight:600;">PDF</span></div></div>
+          <div class="doc-card" onclick="window.open('https://legend-option-b8b.notion.site/DataRoom-Finca-Las-Juntas-2c9b2b1227528001bfa5d5c22e6c611e','_blank')"><div class="doc-icon">📊</div><div class="doc-name">Modelo Financiero</div><div class="doc-desc">Proyecciones de valorización, escenarios de retorno y análisis comparativo.</div><div class="doc-footer"><span class="doc-pending">⏳ Solicitar</span><span style="font-size:11px;color:var(--gold);font-weight:600;">↗ Notion</span></div></div>
+          <div class="doc-card" onclick="window.open('https://legend-option-b8b.notion.site/DataRoom-Finca-Las-Juntas-2c9b2b1227528001bfa5d5c22e6c611e','_blank')"><div class="doc-icon">⚖️</div><div class="doc-name">Escrituras INVIAS — Accesos ALO Sur</div><div class="doc-desc">Escritura pública de acceso por ambos costados de la ALO Sur.</div><div class="doc-footer"><span class="doc-pending">⏳ Due diligence</span><span style="font-size:11px;color:var(--gold);font-weight:600;">↗ Notion</span></div></div>
+        </div>
+      </div>
+
+      <!-- LEGAL -->
+      <div class="page" id="page-legal">
+        <div class="page-header"><h2>Legal & Normativa</h2><p>Marco jurídico, normativo y tributario del activo</p></div>
+        <div class="section-grid">
+          <div class="info-card"><h3>📋 Marco Normativo</h3>
+            <div class="info-row"><span class="info-key">Normativa urbanística</span><span class="info-val">Acuerdo 028 · PBOT Mosquera</span></div>
+            <div class="info-row"><span class="info-key">Usos permitidos</span><span class="info-val">Industrial · Comercial · Institucional</span></div>
+            <div class="info-row"><span class="info-key">Accesos viales</span><span class="info-val">Escritura pública INVIAS · ALO Sur</span></div>
+            <div class="info-row"><span class="info-key">Ley aplicable</span><span class="info-val">Código de Comercio de Colombia</span></div>
+          </div>
+          <div class="info-card"><h3>⚖️ Resolución de Controversias</h3>
+            <div class="info-row"><span class="info-key">Mecanismo</span><span class="info-val">Tribunal de Arbitramento</span></div>
+            <div class="info-row"><span class="info-key">Árbitros</span><span class="info-val">3 árbitros · Decisión en Derecho</span></div>
+            <div class="info-row"><span class="info-key">Institución</span><span class="info-val">CAC — Cámara de Comercio Bogotá</span></div>
+            <div class="info-row"><span class="info-key">Aliados legales</span><span class="info-val">DueLegal · CRCM Asociados</span></div>
+          </div>
+        </div>
+        <div class="info-card" style="margin-top:14px;"><h3>🏢 Identificación de las Partes</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+            <div style="background:var(--gray-light);border-radius:10px;padding:14px;">
+              <div style="font-weight:700;font-size:13px;color:var(--navy);margin-bottom:8px;">Promotor Inmobiliario</div>
+              <div class="info-row"><span class="info-key">Razón social</span><span class="info-val">Terramatch SAS</span></div>
+              <div class="info-row"><span class="info-key">NIT</span><span class="info-val">901.612.770-8</span></div>
+              <div class="info-row"><span class="info-key">Representante</span><span class="info-val">Juan Carlos Nieto R.</span></div>
+              <div class="info-row"><span class="info-key">C.C.</span><span class="info-val">80.414.370</span></div>
+            </div>
+            <div style="background:var(--gray-light);border-radius:10px;padding:14px;">
+              <div style="font-weight:700;font-size:13px;color:var(--navy);margin-bottom:8px;">Propietario del Activo</div>
+              <div class="info-row"><span class="info-key">Nombre</span><span class="info-val">LAS JUNTAS</span></div>
+              <div class="info-row"><span class="info-key">Ubicación</span><span class="info-val">Mosquera, Cundinamarca</span></div>
+              <div class="info-row"><span class="info-key">Tipo de operación</span><span class="info-val">Venta / Desarrollo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM -->
+      <div class="page" id="page-crm">
+        <div class="page-header"><h2>CRM — Pipeline SPANCO</h2><p>Gestión de prospectos e inversionistas · Metodología SPANCO · Forecast 2025/2026</p></div>
+        <div class="crm-wrap">
+          <div class="crm-header">
+            <div><h3>Pipeline de Inversionistas</h3><p>Finca Las Juntas · Terramatch 2025/2026</p></div>
+            <div style="display:flex;gap:8px;">
+              <button class="btns btn-nv" onclick="openCrmModal()">+ Agregar</button>
+              <button class="btns btn-gd" onclick="exportCRM()">↓ CSV</button>
+            </div>
+          </div>
+          <div class="crm-stats" id="crmStats"></div>
+          <div class="crm-toolbar">
+            <div class="crm-search">
+              <svg width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="crmSearch" placeholder="Buscar cliente..." oninput="renderCRM()">
+            </div>
+            <div class="vtoggle">
+              <button class="vbtn active" id="vKanban" onclick="setCrmView('kanban')">Kanban</button>
+              <button class="vbtn" id="vTable" onclick="setCrmView('table')">Tabla</button>
+            </div>
+          </div>
+          <div id="crmKanban" class="kanban-wrap"></div>
+          <div id="crmTable" style="display:none;padding:14px 16px;">
+            <table class="fin-table"><thead><tr><th>#</th><th>Cliente</th><th>Tipo</th><th>Etapa</th><th>Modalidad</th><th>Prioridad</th><th>NDA</th><th>Próximo Paso</th><th></th></tr></thead>
+            <tbody id="crmTableBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRÓXIMOS PASOS -->
+      <div class="page" id="page-nextsteps">
+        <div class="page-header"><h2>Próximos Pasos</h2><p>Hoja de ruta para el cierre de la operación</p></div>
+        <div class="steps-list">
+          <div class="step-item"><div class="step-num">01</div><div class="step-body"><h4>Visita técnica al predio</h4><p>Recorrido presencial, planos catastrales y zonificación. Revisión de vías de acceso INVIAS y delimitación de zonas comercial e industrial.</p></div></div>
+          <div class="step-item"><div class="step-num">02</div><div class="step-body"><h4>Due Diligence Jurídica</h4><p>Revisión de títulos, escrituras INVIAS, normativa POT, gravámenes e historial registral. Aliados: DueLegal / CRCM Asociados.</p></div></div>
+          <div class="step-item"><div class="step-num">03</div><div class="step-body"><h4>Estructuración Financiera</h4><p>Propuesta a medida según modalidad de inversión (Adquisición Total / JV / Desarrollo por Fases). Modelo financiero detallado.</p></div></div>
+          <div class="step-item"><div class="step-num">04</div><div class="step-body"><h4>Firma de LOI o MOU</h4><p>Formalización de la intención de inversión o del marco de cooperación. Acceso al data room completo con toda la documentación.</p></div></div>
+        </div>
+        <div class="info-card"><h3>📋 Informe Mensual de Avance</h3><p style="font-size:13px;color:var(--gray);margin-top:6px;">Terramatch rinde informe mensual a los propietarios con registro de clientes contactados, avances de negociación y estado del pipeline, con acceso exclusivo a este Data Room.</p></div>
+      </div>
+
+      <!-- CONTACTO -->
+      <div class="page" id="page-contact">
+        <div class="page-header"><h2>Contacto — Terramatch</h2><p>Canal exclusivo de gestión de esta oportunidad</p></div>
+        <div class="c-card">
+          <div class="c-av">JN</div>
+          <div class="c-info">
+            <h3>Juan Carlos Nieto R.</h3>
+            <p>Representante — Terramatch SAS · C.C. 80.414.370</p>
+            <div class="c-links">
+              <span class="c-link">📞 +57 324 545 6910</span>
+              <span class="c-link">✉️ jcnieto.marketing [at] gmail.com</span>
+              <span class="c-link">📍 Mosquera, Cundinamarca</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-grid">
+          <div class="info-card"><h3>🏢 Terramatch SAS</h3>
+            <div class="info-row"><span class="info-key">NIT</span><span class="info-val">901.612.770-8</span></div>
+            <div class="info-row"><span class="info-key">Propuesta</span><span class="info-val">Plataforma Web + BPO Inmobiliario</span></div>
+            <div class="info-row"><span class="info-key">Metodología</span><span class="info-val">Terramagia · IUB · SPANCO</span></div>
+          </div>
+          <div class="info-card"><h3>⚖️ Aliados Legales</h3>
+            <div class="info-row"><span class="info-key">DueLegal</span><span class="info-val">due-legal.com</span></div>
+            <div class="info-row"><span class="info-key">CRCM Asociados</span><span class="info-val">crcmasociados.com</span></div>
+            <div class="info-row"><span class="info-key">Especialidad</span><span class="info-val">Derecho Tributario y Comercial</span></div>
+          </div>
+        </div>
+        <div style="background:var(--navy-dark);color:#fff;border-radius:12px;padding:20px;margin-top:4px;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);margin-bottom:8px;">Información Confidencial</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.7);">Uso exclusivo del destinatario autorizado. Prohibida su distribución sin autorización expresa de Terramatch SAS.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- CRM MODAL -->
+<div class="mo" id="crmModal" onclick="if(event.target===this)closeCrmModal()">
+  <div class="modal">
+    <div class="m-hd"><div class="m-ti" id="crmMT">Nuevo Cliente</div><button class="m-cl" onclick="closeCrmModal()">×</button></div>
+    <div class="m-bd">
+      <div class="fg">
+        <div class="fgi full"><label class="fl">Nombre / Organización *</label><input type="text" id="cf_name" class="fi" placeholder="Ej: Patria Investments"></div>
+        <div class="fgi"><label class="fl">Tipo</label><select id="cf_type" class="fs"><option>Fondo de Inversión</option><option>Constructora</option><option>Entidad Pública</option><option>Corporativo</option><option>Family Office</option><option>Banca de Inversión</option><option>Otro</option></select></div>
+        <div class="fgi"><label class="fl">Etapa SPANCO</label><select id="cf_stage" class="fs"><option value="S">S — Suspect</option><option value="P">P — Prospect</option><option value="A">A — Approach</option><option value="N">N — Negotiation</option><option value="C">C — Closing</option><option value="O">O — Order</option></select></div>
+        <div class="fgi"><label class="fl">Modalidad</label><select id="cf_modality" class="fs"><option>Adquisición Total</option><option>Joint Venture</option><option>Desarrollo por Fases</option><option>Por definir</option></select></div>
+        <div class="fgi"><label class="fl">Prioridad</label><select id="cf_priority" class="fs"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+        <div class="fgi"><label class="fl">NDA</label><select id="cf_nda" class="fs"><option>No</option><option>Sí</option><option>En proceso</option></select></div>
+        <div class="fgi full"><label class="fl">Próximo Paso</label><input type="text" id="cf_next" class="fi" placeholder="Ej: Agendar visita técnica, presentar LOI..."></div>
+        <div class="fgi full"><label class="fl">Notas</label><textarea id="cf_notes" class="ft" placeholder="Contexto, acuerdos, observaciones..."></textarea></div>
+      </div>
+    </div>
+    <div class="m-ft">
+      <button class="btns" onclick="closeCrmModal()" style="background:var(--gray-light);color:var(--gray);">Cancelar</button>
+      <button class="btns btn-nv" onclick="saveCrmClient()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" >
+function downloadB64(dataUrl, filename){
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = filename;
+  a.click();
+}
+
+
+// ACCESS
+function checkAccess(){
+  const p=document.getElementById('pwdInput').value;
+  if(p==='terramagia'){
+    document.getElementById('accessScreen').style.display='none';
+    const a=document.getElementById('appShell');a.style.display='flex';a.style.flexDirection='column';
+    renderCRM();updateCrmStats();
+  } else { document.getElementById('accessError').style.display='block'; }
+}
+function logout(){
+  document.getElementById('accessScreen').style.display='flex';
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('pwdInput').value='';
+  document.getElementById('accessError').style.display='none';
+}
+// NAV
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  if(id==='crm'){renderCRM();updateCrmStats();}
+}
+// CRM
+const STAGES={S:{label:'Suspect',sub:'Identificado'},P:{label:'Prospect',sub:'Calificado'},A:{label:'Approach',sub:'Contacto activo'},N:{label:'Negotiation',sub:'Negociando'},C:{label:'Closing',sub:'Por cerrar'},O:{label:'Order',sub:'Cerrado'}};
+let clients=[
+  {id:1,name:'Fondos de Inversión Extranjeros',type:'Fondo de Inversión',stage:'A',modality:'Adquisición Total',priority:'Alta',nda:'Sí',next:'Presentar propuesta vinculante y agendar visita técnica',notes:'Suiza, España y China. NDA firmado.'},
+  {id:2,name:'Gobernación de Cundinamarca',type:'Entidad Pública',stage:'P',modality:'Por definir',priority:'Alta',nda:'No',next:'Reunión institucional y presentación ejecutiva',notes:'Interés en hub logístico departamental.'},
+  {id:3,name:'Patria Investments / Nexus Capital',type:'Banca de Inversión',stage:'A',modality:'Joint Venture',priority:'Alta',nda:'En proceso',next:'Enviar teaser financiero y estructurar JV',notes:'Evalúan JV con constructor local.'},
+  {id:4,name:'Constructora Arpro',type:'Constructora',stage:'P',modality:'Desarrollo por Fases',priority:'Media',nda:'No',next:'Presentar masterplan y cronograma de fases',notes:'Inicio propuesto zona comercial 100.000 m².'},
+  {id:5,name:'AMR Construcciones',type:'Constructora',stage:'S',modality:'Por definir',priority:'Media',nda:'No',next:'Primer contacto y envío de teaser',notes:'Pendiente primer acercamiento.'},
+  {id:6,name:'Invest In Bogotá',type:'Entidad Pública',stage:'S',modality:'Por definir',priority:'Media',nda:'No',next:'Presentar como hub de inversión extranjera',notes:'Facilita conexión con fondos extranjeros.'},
+  {id:7,name:'ANIM',type:'Entidad Pública',stage:'S',modality:'Por definir',priority:'Baja',nda:'No',next:'Identificar contacto clave',notes:'Pendiente calificación.'},
+  {id:8,name:'Fondecun',type:'Fondo de Inversión',stage:'P',modality:'Joint Venture',priority:'Alta',nda:'No',next:'Reunión con directivos del fondo',notes:'Potencial JV público-privado.'},
+  {id:9,name:'CorfiColombiana',type:'Banca de Inversión',stage:'P',modality:'Adquisición Total',priority:'Alta',nda:'No',next:'Presentar indicadores financieros y proyección ALO Sur',notes:'Interés en activos de alta valorización.'},
+];
+let crmEditId=null,crmView='kanban';
+function updateCrmStats(){
+  document.getElementById('crmStats').innerHTML=`
+    <div class="cs"><div class="cs-num">${clients.length}</div><div class="cs-lbl">Total</div></div>
+    <div class="cs"><div class="cs-num">${clients.filter(c=>c.stage==='N').length}</div><div class="cs-lbl">Negociación</div></div>
+    <div class="cs"><div class="cs-num">${clients.filter(c=>c.stage==='C'||c.stage==='O').length}</div><div class="cs-lbl">Por cerrar</div></div>
+    <div class="cs"><div class="cs-num">${clients.filter(c=>c.nda==='Sí').length}</div><div class="cs-lbl">NDA firmados</div></div>
+    <div class="cs"><div class="cs-num">${clients.filter(c=>c.priority==='Alta').length}</div><div class="cs-lbl">Alta prioridad</div></div>`;
+}
+function getFiltered(){const q=(document.getElementById('crmSearch')||{value:''}).value.toLowerCase();return clients.filter(c=>!q||c.name.toLowerCase().includes(q)||c.type.toLowerCase().includes(q));}
+function prioTag(p){const cls=p==='Alta'?'k-hi':p==='Media'?'k-me':'k-lo';return `<span class="k-tag ${cls}">${p}</span>`;}
+function renderCRM(){updateCrmStats();crmView==='kanban'?renderKanban():renderTable();}
+function renderKanban(){
+  const f=getFiltered();
+  document.getElementById('crmKanban').innerHTML=Object.entries(STAGES).map(([k,v])=>{
+    const cards=f.filter(c=>c.stage===k);
+    return `<div class="k-col ks-${k}">
+      <div class="k-head"><div class="k-hl"><div class="k-dot"></div><div><div class="k-title">${k}·${v.label}</div><div class="k-sub">${v.sub}</div></div></div><span class="k-cnt">${cards.length}</span></div>
+      <div class="k-body">${cards.length===0?'<div class="k-empty">Sin clientes</div>':cards.map(c=>`<div class="k-card" onclick="openCrmEdit(${c.id})"><div class="k-name">${c.name}</div><div class="k-type">${c.type}</div><div class="k-tags"><span class="k-tag k-mod">${c.modality}</span>${c.nda==='Sí'?'<span class="k-tag k-nda">NDA✓</span>':''}${prioTag(c.priority)}</div></div>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+function renderTable(){
+  const f=getFiltered();
+  document.getElementById('crmTableBody').innerHTML=f.map((c,i)=>`<tr>
+    <td style="color:var(--gray);font-size:11px;">${i+1}</td><td><strong>${c.name}</strong></td>
+    <td style="font-size:11px;color:var(--gray);">${c.type}</td>
+    <td><select style="padding:2px 6px;border-radius:5px;border:1.5px solid var(--gray-border);font-size:10px;" onchange="chgStage(${c.id},this.value)">${Object.entries(STAGES).map(([k,v])=>`<option value="${k}" ${k===c.stage?'selected':''}>${k}—${v.label}</option>`).join('')}</select></td>
+    <td style="font-size:11px;">${c.modality}</td><td>${prioTag(c.priority)}</td>
+    <td>${c.nda==='Sí'?'<span style="color:var(--green);font-weight:700;">✓</span>':c.nda}</td>
+    <td style="font-size:10px;color:var(--gray);max-width:150px;">${c.next||'—'}</td>
+    <td><button onclick="openCrmEdit(${c.id})" style="background:var(--navy);color:#fff;border:none;padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;margin-right:2px;">✎</button><button onclick="delClient(${c.id})" style="background:#FEF2F2;color:var(--red);border:1px solid var(--red);padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;">✕</button></td>
+  </tr>`).join('');
+}
+function setCrmView(v){
+  crmView=v;
+  document.getElementById('crmKanban').style.display=v==='kanban'?'flex':'none';
+  document.getElementById('crmTable').style.display=v==='table'?'block':'none';
+  document.getElementById('vKanban').className='vbtn'+(v==='kanban'?' active':'');
+  document.getElementById('vTable').className='vbtn'+(v==='table'?' active':'');
+  renderCRM();
+}
+function chgStage(id,s){const c=clients.find(c=>c.id===id);if(c){c.stage=s;renderCRM();}}
+function delClient(id){if(!confirm('¿Eliminar?'))return;clients=clients.filter(c=>c.id!==id);renderCRM();}
+function openCrmModal(){
+  crmEditId=null;document.getElementById('crmMT').textContent='Nuevo Cliente';
+  ['cf_name','cf_next','cf_notes'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('cf_stage').value='S';document.getElementById('cf_priority').value='Media';document.getElementById('cf_nda').value='No';
+  document.getElementById('crmModal').classList.add('open');
+}
+function openCrmEdit(id){
+  const c=clients.find(c=>c.id===id);if(!c)return;
+  crmEditId=id;document.getElementById('crmMT').textContent='Editar — '+c.name;
+  document.getElementById('cf_name').value=c.name;document.getElementById('cf_type').value=c.type;
+  document.getElementById('cf_stage').value=c.stage;document.getElementById('cf_modality').value=c.modality;
+  document.getElementById('cf_priority').value=c.priority;document.getElementById('cf_nda').value=c.nda;
+  document.getElementById('cf_next').value=c.next;document.getElementById('cf_notes').value=c.notes;
+  document.getElementById('crmModal').classList.add('open');
+}
+function closeCrmModal(){document.getElementById('crmModal').classList.remove('open');}
+function saveCrmClient(){
+  const name=document.getElementById('cf_name').value.trim();if(!name){alert('Nombre obligatorio');return;}
+  const d={name,type:document.getElementById('cf_type').value,stage:document.getElementById('cf_stage').value,modality:document.getElementById('cf_modality').value,priority:document.getElementById('cf_priority').value,nda:document.getElementById('cf_nda').value,next:document.getElementById('cf_next').value,notes:document.getElementById('cf_notes').value};
+  if(crmEditId){const i=clients.findIndex(c=>c.id===crmEditId);clients[i]={...clients[i],...d};}
+  else{d.id=Date.now();clients.push(d);}
+  closeCrmModal();renderCRM();
+}
+function exportCRM(){
+  const h=['Nombre','Tipo','Etapa','Modalidad','Prioridad','NDA','Próximo Paso','Notas'];
+  const rows=clients.map(c=>[c.name,c.type,c.stage+'—'+STAGES[c.stage].label,c.modality,c.priority,c.nda,c.next,c.notes].map(v=>`"${(v||'').replace(/"/g,'""')}"`).map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='CRM_LasJuntas.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
